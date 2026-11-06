@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="三道圆与椭圆习题的交互讲义。旋转直线，观察交点、面积比、斜率和与弦中点轨迹。">
+<title>圆与椭圆 · 三道习题互动讲义</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink:#172f38; --muted:#52686c; --paper:#f1f5f2; --white:#fff;
+  --line:#d6e1dc; --teal:#116f61; --sea:#dff1e9; --dark:#123a34;
+  --blue:#245c9d; --orange:#9a491f; --violet:#6847a7;
+}
+* { box-sizing:border-box }
+body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.62 system-ui,"Microsoft YaHei",sans-serif }
+button,input,summary { font:inherit }
+button,summary { cursor:pointer }
+button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible { outline:3px solid #247dc3; outline-offset:3px }
+[hidden] { display:none!important }
+header { background:var(--dark); color:#fff; padding:30px 20px 32px }
+.wrap { width:min(1320px,100%); margin:auto }
+.eyebrow { color:#a6e4ce; font-size:.8rem; font-weight:750; letter-spacing:.14em; margin:0 }
+h1 { font-size:clamp(26px,3vw,40px); margin:6px 0 6px; line-height:1.3 }
+header p:last-child { margin:0; color:#d5e9e2 }
+main { padding:20px 18px 40px }
+nav { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px }
+button { border:1px solid var(--line); border-radius:8px; background:var(--white); color:var(--ink); padding:8px 13px; min-height:42px; font-weight:650 }
+button:hover { background:#e9f4ee }
+button[aria-pressed=true],button[aria-selected=true] { color:#fff; background:var(--teal); border-color:var(--teal) }
+nav button { text-align:left }
+.problem { background:var(--white); border:1px solid var(--line); border-radius:16px; overflow:hidden }
+.statement { padding:20px 23px; border-bottom:1px solid var(--line) }
+h2 { margin:0 0 7px; line-height:1.36; font-size:clamp(20px,2.3vw,29px) }
+.statement p { margin:5px 0; max-width:90ch }
+.statement ol { padding-left:1.45em; margin:7px 0 0 }
+.math { font-family:"Cambria Math",Cambria,"Microsoft YaHei",serif; font-weight:600 }
+.lab { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr) }
+.graph-column { min-width:0; padding:16px; border-right:1px solid var(--line) }
+.side { min-width:0; padding:20px }
+.controls { display:grid; gap:10px; margin:0 0 10px }
+.buttons { display:flex; flex-wrap:wrap; gap:7px }
+.buttons button { font-size:.88rem }
+.range-head { display:flex; justify-content:space-between; gap:10px; font-weight:650; align-items:baseline }
+output { color:var(--teal); font-variant-numeric:tabular-nums; text-align:right }
+input[type=range] { width:100%; min-height:28px; accent-color:var(--teal); margin:1px 0 0 }
+.graph { display:block; width:100%; height:clamp(360px,43vw,490px); border:1px solid var(--line); border-radius:10px; background:#f9fcfa; touch-action:pan-y }
+.graph:has(.handle) { touch-action:none }
+.graph .handle { cursor:grab }
+.graph text { font-family:system-ui,"Microsoft YaHei",sans-serif; pointer-events:none }
+.graph-note { margin:8px 0 0; color:var(--muted); font-size:.84rem }
+.status { display:inline-block; background:var(--sea); color:var(--dark); padding:5px 9px; border-radius:6px; font-size:.84rem; font-weight:700 }
+.status[data-kind=warn] { background:#ffeedf; color:#783c20 }
+h3 { font-size:1.05rem; margin:0 0 8px }
+.side p { margin:0 0 12px }
+.measure { display:grid; grid-template-columns:1fr auto; gap:0; margin:12px 0; font-size:.93rem }
+.measure dt,.measure dd { margin:0; padding:6px 0; border-bottom:1px solid var(--line) }
+.measure dd { padding-left:10px; color:var(--teal); text-align:right; font-weight:700; font-variant-numeric:tabular-nums }
+.prompt { border-left:4px solid #42a48b; background:#eef7f2; padding:10px 12px; border-radius:5px; font-size:.92rem }
+details { margin-top:16px; border:1px solid var(--line); border-radius:10px }
+summary { padding:10px 13px; font-weight:750; background:var(--dark); color:white; border-radius:9px }
+details[open] summary { border-radius:9px 9px 0 0 }
+summary .hide,details[open] summary .show { display:none }
+details[open] summary .hide { display:inline }
+.answer { padding:14px; font-size:.94rem; overflow-wrap:anywhere }
+.answer ol { padding-left:1.35em; margin:4px 0 12px }
+.answer li { margin:0 0 9px }
+.result { color:var(--dark); background:var(--sea); padding:9px 11px; border-radius:6px; font-weight:750 }
+.note { color:var(--muted); font-size:.83rem; margin:16px 3px 0 }
+@media(max-width:870px) {
+  .lab { grid-template-columns:1fr }
+  .graph-column { border-right:0; border-bottom:1px solid var(--line) }
+  .graph { height:420px }
+}
+@media(max-width:500px) {
+  main { padding:14px 9px 28px }
+  header { padding:22px 14px }
+  .statement,.side { padding:15px }
+  .graph-column { padding:9px }
+  .graph { height:360px }
+  nav { gap:5px }
+  nav button { font-size:.82rem; padding:6px 9px }
+  .range-head { font-size:.87rem }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="eyebrow">解析几何 · 动图习题</p>
+  <h1>圆与椭圆的三道交互习题</h1>
+  <p>拖动参数或紫色控制点，观察图中线段和数值的变化。独立尝试后，再点「显示答案」。</p>
+</div></header>
+<main class="wrap">
+  <nav role="tablist" aria-label="选择习题">
+    <button id="tab-ellipse" role="tab" aria-controls="ellipse" aria-selected="true" data-problem="ellipse">第 14 题 · 椭圆与斜率和</button>
+    <button id="tab-area" role="tab" aria-controls="area" aria-selected="false" tabindex="-1" data-problem="area">3-1 · 圆与三角形面积比</button>
+    <button id="tab-midpoint" role="tab" aria-controls="midpoint" aria-selected="false" tabindex="-1" data-problem="midpoint">3-2 · 弦中点轨迹与分点</button>
+  </nav>
+  <noscript><p>请在浏览器中启用 JavaScript 以操作图形。题干和答案仍可阅读。</p></noscript>
+
+  <section id="ellipse" class="problem" role="tabpanel" aria-labelledby="tab-ellipse">
+    <div class="statement">
+      <h2>第 14 题 · 焦半径之和与割线斜率</h2>
+      <p>已知椭圆 <span class="math">E：x²/a²＋y²/b²＝1（a＞b＞0）</span>。椭圆上一点 <span class="math">A(2,1)</span> 到两焦点的距离之和为 <span class="math">2√6</span>。</p>
+      <ol><li>求椭圆 E 的方程和离心率。</li><li>过 <span class="math">P(2,3)</span> 的直线 <i>l</i> 与 E 交于不同的两点 B、C。若直线 AB 与 AC 的斜率之和为 0，求 <i>l</i> 的方程。</li></ol>
+    </div>
+    <div class="lab">
+      <div class="graph-column">
+        <div class="controls">
+          <div class="buttons">
+            <button type="button" data-phase="focus" aria-pressed="true">（1）调节候选椭圆</button>
+            <button type="button" data-phase="secant" aria-pressed="false">（2）旋转过 P 的直线</button>
+          </div>
+          <div id="ellipse-focus-control"><div class="range-head"><label for="a2">候选长半轴的平方 a²</label><output id="a2-value" for="a2"></output></div>
+            <input id="a2" type="range" min="5.1" max="10" step="0.02" value="7.3">
+          </div>
+          <div id="ellipse-secant-control" hidden><div class="range-head"><label for="ellipse-angle">直线与 x 轴的有向角</label><output id="ellipse-angle-value" for="ellipse-angle"></output></div>
+            <input id="ellipse-angle" type="range" min="-90" max="90" step="0.1" value="59">
+          </div>
+        </div>
+        <svg id="ellipse-graph" class="graph" role="img" aria-label="椭圆、焦点、已知点与旋转割线"></svg>
+        <p class="graph-note" id="ellipse-legend">A 始终在候选椭圆上。拖动 a²，观察两段焦半径之和。</p>
+      </div>
+      <aside class="side">
+        <h3>读图记录</h3>
+        <span id="ellipse-status" class="status" role="status"></span>
+        <dl class="measure" id="ellipse-measure"></dl>
+        <p class="prompt" id="ellipse-prompt"></p>
+        <details id="ellipse-answer">
+          <summary><span class="show">显示答案</span><span class="hide">收起答案</span> · 含两小问</summary>
+          <div class="answer">
+            <p class="result">（1）E：x²/6＋y²/3＝1，e＝√2/2。<br>（2）l：y＝x＋1。</p>
+            <ol>
+              <li>由椭圆定义，<span class="math">2a＝|AF₁|＋|AF₂|＝2√6</span>，所以 <span class="math">a²＝6</span>。代入 A 得 <span class="math">4/6＋1/b²＝1</span>，所以 <span class="math">b²＝3</span>。于是 <span class="math">c²＝a²−b²＝3</span>，<span class="math">e＝c/a＝√2/2</span>。</li>
+              <li>竖直线 <span class="math">x＝2</span> 经过 A，其中一条待比较直线无法由两个不同点确定，因此排除。令 <span class="math">l：y−3＝k(x−2)</span>，取 <span class="math">t＝x−2</span>。代入 <span class="math">x²＋2y²＝6</span> 得 <span class="math">(1＋2k²)t²＋(4＋12k)t＋16＝0</span>。</li>
+              <li>设两根为 t₁、t₂。两条斜率分别是 <span class="math">k＋2/t₁</span> 和 <span class="math">k＋2/t₂</span>。用韦达定理得斜率和 <span class="math">2k＋2(t₁＋t₂)/(t₁t₂)＝(k−1)/2</span>，故 <span class="math">k＝1</span>。</li>
+              <li>此时两根为 −4 和 −4/3，两个交点为 <span class="math">(−2,−1)</span> 和 <span class="math">(2/3,5/3)</span>，两条斜率为 1/2 与 −1/2，满足题意。</li>
+            </ol>
+            <div class="buttons"><button type="button" data-demo="ellipse-focus">验证第（1）问</button><button type="button" data-demo="ellipse-line">验证第（2）问</button></div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </section>
+
+  <section id="area" class="problem" role="tabpanel" aria-labelledby="tab-area" hidden>
+    <div class="statement">
+      <h2>3-1 · 两个三角形共用哪一条高？</h2>
+      <p>已知圆 <span class="math">D：x²＋y²＝4</span>，过 <span class="math">Q(−4,0)</span> 的直线与圆 D 交于 M、N 两点，M 在 N、Q 之间。若 <span class="math">S<sub>△OQN</sub>＝2S<sub>△OMN</sub></span>（O 为坐标原点），求直线 MN 的方程。</p>
+    </div>
+    <div class="lab">
+      <div class="graph-column">
+        <div class="controls">
+          <div><div class="range-head"><label for="area-angle">旋转过 Q 的直线</label><output id="area-angle-value" for="area-angle"></output></div>
+            <input id="area-angle" type="range" min="-45" max="45" step="0.1" value="17">
+          </div>
+        </div>
+        <svg id="area-graph" class="graph" role="img" aria-label="过 Q 的割线、两三角形及共同的垂直高度 OH"></svg>
+        <p class="graph-note">蓝色为 △OMN，蓝色与橙色合起来为 △OQN。粗线标出弦 MN，H 为 O 到直线的垂足。</p>
+      </div>
+      <aside class="side">
+        <h3>读图记录</h3>
+        <span id="area-status" class="status" role="status"></span>
+        <dl class="measure" id="area-measure"></dl>
+        <p class="prompt">Q、M、N 在同一条直线上，两个三角形的顶点都在 O。先沿图找共同的高，再比较 QN 和 MN。</p>
+        <details id="area-answer">
+          <summary><span class="show">显示答案</span><span class="hide">收起答案</span></summary>
+          <div class="answer">
+            <p class="result">直线 MN 为 y＝(√15/9)(x＋4) 或 y＝−(√15/9)(x＋4)。</p>
+            <ol>
+              <li>两三角形以 QN、MN 为底，共用高 OH。三角形非退化时，面积比等于底边比，所以 <span class="math">QN＝2MN</span>。由 Q—M—N 的顺序可知 <span class="math">QM＝MN</span>。</li>
+              <li>设 <span class="math">M(u,v)</span>，M 是 QN 的中点，因此 <span class="math">N(2u＋4,2v)</span>。代入圆方程得 <span class="math">u²＋v²＝4</span>、<span class="math">(2u＋4)²＋4v²＝4</span>。后式减去前式的 4 倍，得 <span class="math">16u＋16＝−12</span>，所以 <span class="math">u＝−7/4</span>、<span class="math">v＝±√15/4</span>。</li>
+              <li>直线过 Q，斜率 <span class="math">v/(u＋4)＝±√15/9</span>，代回点斜式即得两条直线。写成一般式时常数项是 <span class="math">4k</span>，因为 <span class="math">y＝k(x＋4)</span>。</li>
+            </ol>
+            <p class="note">按题中三角形非退化理解，过 O 的水平线不计。若仅把条件视作允许退化的零面积等式，y＝0 也使两边同为零，此时面积比无定义。</p>
+            <div class="buttons"><button type="button" data-demo="area-positive">验证上方割线</button><button type="button" data-demo="area-negative">验证下方割线</button></div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </section>
+
+  <section id="midpoint" class="problem" role="tabpanel" aria-labelledby="tab-midpoint" hidden>
+    <div class="statement">
+      <h2>3-2 · 弦中点留痕，分点比例定直线</h2>
+      <p>已知圆 <span class="math">C：x²＋y²−2y−2＝0</span>，直线 <span class="math">l：mx−y＋1＋m＝0</span>，点 <span class="math">P(−1,1)</span>。</p>
+      <ol><li>设 l 与圆 C 交于不同的两点 A、B，求弦 AB 的中点 M 的轨迹方程。</li><li>若 <span class="math">|AP|/|PB|＝2</span>，求直线 l 的方程。</li></ol>
+    </div>
+    <div class="lab">
+      <div class="graph-column">
+        <div class="controls">
+          <div><div class="range-head"><label for="midpoint-angle">旋转过 P 的直线</label><output id="midpoint-angle-value" for="midpoint-angle"></output></div>
+            <input id="midpoint-angle" type="range" min="-90" max="90" step="0.1" value="30">
+          </div>
+          <div class="buttons">
+            <button type="button" id="trail-toggle" aria-pressed="true">记录中点留痕</button>
+            <button type="button" id="trail-clear">清除留痕</button>
+            <button type="button" id="vertical-limit">查看竖直极限</button>
+          </div>
+        </div>
+        <svg id="midpoint-graph" class="graph" role="img" aria-label="过 P 的弦、圆心 K、中点 M、垂线 KM 与中点留痕"></svg>
+        <p class="graph-note">橙色标 AP，蓝色标 PB。绿色点为已经扫过的中点位置。比较两条彩色线段时，A 取离 P 较远的一端。</p>
+      </div>
+      <aside class="side">
+        <h3>读图记录</h3>
+        <span id="midpoint-status" class="status" role="status"></span>
+        <dl class="measure" id="midpoint-measure"></dl>
+        <p class="prompt">K 是圆心。留意 KM 与弦的关系，并把角度拨到竖直位置看看：该位置是否能用题设的有限斜率 m 表示？</p>
+        <details id="midpoint-answer">
+          <summary><span class="show">显示答案</span><span class="hide">收起答案</span> · 含两小问</summary>
+          <div class="answer">
+            <p class="result">（1）(x＋1/2)²＋(y−1)²＝1/4，去掉 P(−1,1)。<br>（2）y−1＝√3(x＋1) 或 y−1＝−√3(x＋1)。</p>
+            <ol>
+              <li>配方得 <span class="math">x²＋(y−1)²＝3</span>，所以圆心 <span class="math">K(0,1)</span>，半径 √3，<span class="math">KP＝1＜√3</span>。每条允许的直线都过圆内点 P，因此都有两个交点。</li>
+              <li>弦中点 M 是 K 在直线上的垂足，故 <span class="math">(M−K)·(M−P)＝0</span>，即 <span class="math">x(x＋1)＋(y−1)²＝0</span>。这给出以 KP 为直径的圆。M＝K 可由水平线得到。M＝P 只对应竖直线 <span class="math">x＝−1</span>，它不在给定直线族中。其余圆上点都由直线 PM 得到。</li>
+              <li>P 在弦内。点幂给出 <span class="math">|AP||PB|＝(√3)²−KP²＝2</span>。结合 <span class="math">|AP|＝2|PB|</span>，得 <span class="math">|AP|＝2</span>、<span class="math">|PB|＝1</span>，因此中点满足 <span class="math">PM＝(2−1)/2＝1/2</span>。</li>
+              <li>在直角三角形 KMP 中，<span class="math">cos∠KPM＝PM/KP＝1/2</span>。于是直线与向右的水平射线夹角为 60°，向上或向下，<span class="math">m＝±√3</span>。</li>
+            </ol>
+            <div class="buttons"><button type="button" data-demo="midpoint-positive">验证 m＝√3</button><button type="button" data-demo="midpoint-negative">验证 m＝−√3</button></div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </section>
+  <p class="note">照片第 13 题的首行被裁切，三角形的顶点条件缺失。本讲义收录题干完整可辨的第 14 题、3-1 和 3-2。</p>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const colors = { ink:'#254149', muted:'#586d74', grid:'#e1ebe5', teal:'#087866', blue:'#235da0', orange:'#a24e23', violet:'#6847a7' };
+  const state = { problem:'ellipse', phase:'focus', ellipseAngle:59, areaAngle:17, midpointAngle:30, trail:[], tracing:true };
+  const graphState = {};
+  const rad = degrees => degrees * Math.PI / 180;
+  const format = (value, places = 3) => Math.abs(value) < 0.5 * 10 ** -places ? (0).toFixed(places) : value.toFixed(places);
+  const point = (x, y) => ({x, y});
+  const at = (origin, direction, t) => point(origin.x + t * direction.x, origin.y + t * direction.y);
+  const center = (a, b) => point((a.x + b.x) / 2, (a.y + b.y) / 2);
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const cross = (a, b, c) => (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+  const direction = degrees => Math.abs(degrees) === 90 ? point(0, Math.sign(degrees)) : point(Math.cos(rad(degrees)), Math.sin(rad(degrees)));
+  const escape = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+  function intersect(p, u, origin, rx, ry) {
+    const x = p.x - origin.x;
+    const y = p.y - origin.y;
+    const A = u.x ** 2 / rx ** 2 + u.y ** 2 / ry ** 2;
+    const B = 2 * (x * u.x / rx ** 2 + y * u.y / ry ** 2);
+    const C = x ** 2 / rx ** 2 + y ** 2 / ry ** 2 - 1;
+    const delta = B * B - 4 * A * C;
+    if (delta < -1e-9) return [];
+    if (Math.abs(delta) <= 1e-9) return [-B / (2 * A)];
+    const root = Math.sqrt(delta);
+    return [(-B - root) / (2 * A), (-B + root) / (2 * A)];
+  }
+
+  function drawBoard(id, bounds, draw) {
+    const svg = $(id + '-graph');
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width) return;
+    const width = rect.width;
+    const height = rect.height;
+    const [xMin, xMax, yMin, yMax] = bounds;
+    const scale = Math.min((width - 34) / (xMax - xMin), (height - 34) / (yMax - yMin));
+    const ox = width / 2 - scale * (xMin + xMax) / 2;
+    const oy = height / 2 + scale * (yMin + yMax) / 2;
+    const screen = p => point(ox + scale * p.x, oy - scale * p.y);
+    const map = p => { const q = screen(p); return q.x + ',' + q.y; };
+    const marks = [];
+    const tags = [];
+    const boxes = [];
+    const font = width < 450 ? 12 : 14;
+    const board = {
+      line(a, b, color, thickness = 2, dash = '') {
+        const p = screen(a), q = screen(b);
+        marks.push(`<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="${color}" stroke-width="${thickness}" stroke-dasharray="${dash}" stroke-linecap="round"/>`);
+      },
+      ellipse(p, rx, ry, color, fill = 'none', dash = '') {
+        const q = screen(p);
+        marks.push(`<ellipse cx="${q.x}" cy="${q.y}" rx="${rx*scale}" ry="${ry*scale}" fill="${fill}" stroke="${color}" stroke-width="2.5" stroke-dasharray="${dash}"/>`);
+      },
+      polygon(points, fill, stroke = 'none') {
+        marks.push(`<polygon points="${points.map(map).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="1.4"/>`);
+      },
+      dot(p, color, radius = 4, open = false) {
+        const q = screen(p);
+        marks.push(`<circle cx="${q.x}" cy="${q.y}" r="${radius}" fill="${open?'white':color}" stroke="${open?color:'white'}" stroke-width="1.6"/>`);
+      },
+      tag(p, label, color = colors.ink, dx = 9, dy = -21) {
+        const q = screen(p);
+        const textWidth = [...label].reduce((sum, char) => sum + (char.charCodeAt(0) > 255 ? font : font * .64), 0);
+        const w = textWidth + 10, h = font + 7;
+        const offsets = [[0,0],[0,-24],[0,24],[-24,0],[24,0],[0,-48],[0,48],[-36,24],[36,-24]];
+        let best;
+        for (const [shiftX, shiftY] of offsets) {
+          const x = clamp(q.x + dx + shiftX, 3, width-w-3);
+          const y = clamp(q.y + dy + shiftY, 3, height-h-3);
+          const overlap = boxes.reduce((sum, b) => sum + Math.max(0,Math.min(x+w,b.x+b.w)-Math.max(x,b.x)) * Math.max(0,Math.min(y+h,b.y+b.h)-Math.max(y,b.y)), 0);
+          const cost = overlap * 20 + Math.hypot(shiftX,shiftY);
+          if (!best || cost < best.cost) best = {x,y,w,h,cost};
+          if (!overlap) break;
+        }
+        boxes.push(best);
+        const edgeX = clamp(q.x,best.x,best.x+w), edgeY = clamp(q.y,best.y,best.y+h);
+        if (Math.hypot(edgeX-q.x,edgeY-q.y) > 12) tags.push(`<line x1="${q.x}" y1="${q.y}" x2="${edgeX}" y2="${edgeY}" stroke="#8da49b"/>`);
+        tags.push(`<rect x="${best.x}" y="${best.y}" width="${w}" height="${h}" rx="4" fill="#fffffff4"/><text x="${best.x+5}" y="${best.y+font+1}" font-size="${font}" font-weight="650" fill="${color}">${escape(label)}</text>`);
+      },
+      rightAngle(vertex, u, v, size = 0.17) {
+        const p = at(vertex,u,size), q = at(p,v,size), r = at(vertex,v,size);
+        this.line(p,q,colors.teal,1.3);
+        this.line(q,r,colors.teal,1.3);
+      },
+      handle(p, u, offset) {
+        const q = screen(at(p,u,offset));
+        graphState[id].pivot = p;
+        marks.push(`<g class="handle" data-handle="true" aria-hidden="true"><circle cx="${q.x}" cy="${q.y}" r="22" fill="transparent"/><circle cx="${q.x}" cy="${q.y}" r="8" fill="${colors.violet}" stroke="white" stroke-width="2"/></g>`);
+      },
+      bracket(a, b, normal, label, color, offset) {
+        const p = at(a,normal,offset), q = at(b,normal,offset);
+        this.line(p,q,color,1.5);
+        this.line(at(p,normal,-.07),at(p,normal,.07),color,1.5);
+        this.line(at(q,normal,-.07),at(q,normal,.07),color,1.5);
+        this.tag(center(p,q),label,color,6,5);
+      },
+    };
+    graphState[id] = {ox,oy,scale,width,height};
+    for (let x = Math.ceil(xMin); x <= xMax; x++) {
+      if (x) board.line(point(x,yMin),point(x,yMax),colors.grid,1);
+    }
+    for (let y = Math.ceil(yMin); y <= yMax; y++) {
+      if (y) board.line(point(xMin,y),point(xMax,y),colors.grid,1);
+    }
+    board.line(point(xMin,0),point(xMax,0),'#8da49e',1.3);
+    board.line(point(0,yMin),point(0,yMax),'#8da49e',1.3);
+    board.tag(point(xMax,0),'x',colors.muted,-7,-25);
+    board.tag(point(0,yMax),'y',colors.muted,6,-11);
+    draw(board);
+    svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+    svg.innerHTML = marks.join('') + tags.join('');
+  }
+
+  function record(id, status, pairs, warning = false) {
+    const badge = $(id + '-status');
+    if (badge.textContent !== status) badge.textContent = status;
+    badge.dataset.kind = warning ? 'warn' : 'normal';
+    $(id + '-measure').innerHTML = pairs.map(([key,value]) => `<dt>${escape(key)}</dt><dd>${escape(value)}</dd>`).join('');
+  }
+
+  function ellipseLab() {
+    const A = point(2,1), O = point(0,0), P = point(2,3);
+    if (state.phase === 'focus') {
+      const a2 = Number($('a2').value), b2 = a2/(a2-4);
+      const a = Math.sqrt(a2), b = Math.sqrt(b2), c = Math.sqrt(a2-b2);
+      const F1 = point(-c,0), F2 = point(c,0);
+      const d1 = distance(A,F1), d2 = distance(A,F2);
+      $('a2-value').textContent = 'a² = ' + format(a2,2);
+      drawBoard('ellipse',[-3.8,3.8,-2.6,2.8],g => {
+        g.ellipse(O,a,b,colors.teal,'#dff1e960');
+        g.line(F1,A,colors.orange,3);
+        g.line(F2,A,colors.blue,3);
+        g.dot(F1,colors.orange); g.dot(F2,colors.blue); g.dot(A,colors.ink,5);
+        g.tag(O,'O',colors.muted,-14,5);
+        g.tag(F1,'F₁',colors.orange,-13,10);
+        g.tag(F2,'F₂',colors.blue,9,10);
+        g.tag(A,'A(2,1)',colors.ink,9,-26);
+        g.tag(center(F1,A),'AF₁ ≈ '+format(d1,2),colors.orange,-66,-26);
+        g.tag(center(F2,A),'AF₂ ≈ '+format(d2,2),colors.blue,12,2);
+      });
+      record('ellipse','A 在候选椭圆上',[
+        ['左焦半径 AF₁','≈ '+format(d1)], ['右焦半径 AF₂','≈ '+format(d2)],
+        ['当前距离和','≈ '+format(d1+d2)], ['题设距离和','2√6 ≈ '+format(2*Math.sqrt(6))]
+      ]);
+      $('ellipse-prompt').textContent = '每次改变 a²，图形都经过 A。哪一项条件可以锁定 a？再用 A 的坐标确定 b。';
+      return;
+    }
+    const theta = state.ellipseAngle, u = direction(theta);
+    const ts = intersect(P,u,O,Math.sqrt(6),Math.sqrt(3));
+    const pts = ts.map(t => at(P,u,t));
+    const vertical = Math.abs(u.x) < 1e-10;
+    const slopeSumDefined = pts.length === 2 && !vertical;
+    const slopes = slopeSumDefined ? pts.map(p => (p.y-A.y)/(p.x-A.x)) : [];
+    $('ellipse-angle-value').textContent = format(theta,1) + '°';
+    drawBoard('ellipse',[-3.7,4,-2.6,3.7],g => {
+      g.ellipse(O,Math.sqrt(6),Math.sqrt(3),colors.teal,'#dff1e960');
+      g.line(at(P,u,-12),at(P,u,12),colors.violet,1.7,'6 5');
+      g.line(point(-3.2,1),point(3.4,1),'#9db1ab',1.2,'5 5');
+      if (pts.length === 2) {
+        g.line(pts[0],pts[1],colors.violet,4);
+        if (slopeSumDefined) {
+          g.line(A,pts[0],colors.orange,2.5);
+          g.line(A,pts[1],colors.blue,2.5);
+          g.tag(center(A,pts[0]),'kAB ≈ '+format(slopes[0],2),colors.orange,-70,6);
+          g.tag(center(A,pts[1]),'kAC ≈ '+format(slopes[1],2),colors.blue,10,-28);
+        }
+      }
+      pts.forEach((p,i) => {
+        g.dot(p,colors.violet);
+        if (!vertical || distance(p,A) > .02) g.tag(p,pts.length === 1?'切点':i?'C':'B',colors.violet,-20,10);
+      });
+      g.dot(A,colors.ink,5); g.tag(A,'A(2,1)',colors.ink,11,8);
+      g.dot(P,colors.ink,5); g.tag(P,'P(2,3)',colors.ink,-65,-23);
+      g.handle(P,u,-1.12);
+    });
+    const status = vertical ? '竖直线经过 A，斜率和无定义' : pts.length===2?'割线 · 两个不同交点':pts.length===1?'切线 · 只有一个交点':'无交点';
+    const pairs = [['当前 l 的斜率',vertical?'不存在':'≈ '+format(u.y/u.x)]];
+    if (slopeSumDefined) pairs.push(['kAB','≈ '+format(slopes[0])],['kAC','≈ '+format(slopes[1])],['斜率和','≈ '+format(slopes[0]+slopes[1])]);
+    record('ellipse',status,pairs,!slopeSumDefined);
+    $('ellipse-prompt').textContent = '看橙、蓝线段与经过 A 的水平虚线。斜率互为相反数时，两条直线关于这条水平线对称。';
+  }
+
+  function areaLab() {
+    const theta = state.areaAngle, u = direction(theta);
+    const O = point(0,0), Q = point(-4,0);
+    const ts = intersect(Q,u,O,2,2);
+    const H = at(Q,u,4*u.x);
+    const height = distance(H,O);
+    const normal = point(-u.y,u.x);
+    const pts = ts.map(t => at(Q,u,t));
+    $('area-angle-value').textContent = format(theta,1) + '°';
+    drawBoard('area',[-5.2,3,-3.05,3.05],g => {
+      g.ellipse(O,2,2,colors.teal,'#dff1e948');
+      g.line(at(Q,u,-11),at(Q,u,11),colors.violet,1.7,'6 5');
+      if (pts.length===2) {
+        const [M,N] = pts;
+        g.polygon([O,Q,M],'#ffba8066','#cf8b63');
+        g.polygon([O,M,N],'#81b9f18a','#719bca');
+        g.line(M,N,colors.blue,4);
+        if (height > 1e-8) {
+          const toO = point((O.x-H.x)/height,(O.y-H.y)/height);
+          g.line(O,H,colors.teal,2,'4 4');
+          if (height > .22) g.rightAngle(H,u,toO);
+          g.dot(H,colors.teal);
+          g.tag(H,'H',colors.teal,10,8);
+          g.tag(center(O,H),'高 OH',colors.teal,9,-12);
+        }
+        const sign = cross(Q,N,O) > 0 ? -1 : 1;
+        const outward = point(sign*normal.x,sign*normal.y);
+        g.bracket(Q,N,outward,'QN ≈ '+format(ts[1],2),colors.orange,.54);
+        g.bracket(M,N,outward,'MN ≈ '+format(ts[1]-ts[0],2),colors.blue,.96);
+        g.dot(M,colors.blue); g.dot(N,colors.blue);
+        g.tag(M,'M',colors.blue,-21,-22); g.tag(N,'N',colors.blue,9,-23);
+      } else if (pts.length===1) {
+        g.dot(pts[0],colors.teal); g.tag(pts[0],'切点',colors.teal);
+      }
+      g.dot(O,colors.ink); g.tag(O,'O(0,0)',colors.ink,9,9);
+      g.dot(Q,colors.ink); g.tag(Q,'Q(−4,0)',colors.ink,-54,8);
+      g.handle(Q,u,1.18);
+    });
+    const pairs = [['共同的高 OH','≈ '+format(height)]];
+    let status = '割线 · Q、M、N 依次排列';
+    if (pts.length === 2) {
+      const QN = ts[1], MN = ts[1]-ts[0];
+      pairs.push(['底边 QN / MN',format(QN)+' / '+format(MN)]);
+      pairs.push(['S△OQN / S△OMN',height<1e-8?'无定义（0 / 0）':'≈ '+format(QN/MN)]);
+      if (height<1e-8) status='过圆心 · 两个三角形面积均为 0';
+    } else {
+      status = pts.length===1 ? '相切 · M、N 重合' : '无交点 · 两个三角形无法构成';
+    }
+    record('area',status,pairs,pts.length!==2 || height<1e-8);
+  }
+
+  function midpointLab() {
+    const theta = state.midpointAngle, u = direction(theta);
+    const K = point(0,1), P = point(-1,1), R = Math.sqrt(3);
+    const [tB,tA] = intersect(P,u,K,R,R);
+    const A = at(P,u,tA), B = at(P,u,tB), M = at(P,u,u.x);
+    const vertical = Math.abs(u.x)<1e-10, height = distance(K,M);
+    if (state.tracing && !vertical && !state.trail.some(p => distance(p,M)<.014)) state.trail.push(M);
+    $('midpoint-angle-value').textContent = format(theta,1)+'°';
+    drawBoard('midpoint',[-2.65,2.55,-1.32,3.28],g => {
+      g.ellipse(K,R,R,colors.teal,'#dff1e950');
+      if ($('midpoint-answer').open) {
+        g.ellipse(point(-.5,1),.5,.5,colors.teal,'none','5 4');
+        g.dot(P,colors.teal,6,true);
+        g.tag(point(-.5,1.5),'中点轨迹',colors.teal,-21,-30);
+      }
+      state.trail.forEach(p => g.dot(p,'#69ab93',2.4));
+      g.line(at(P,u,-10),at(P,u,10),colors.violet,1.6,'6 5');
+      g.line(A,P,colors.orange,4);
+      g.line(P,B,colors.blue,4);
+      g.line(K,P,'#9db1ab',1.3,'5 5');
+      if (height > 1e-8) {
+        const normal = point((K.x-M.x)/height,(K.y-M.y)/height);
+        g.line(K,M,colors.teal,2.1,'4 4');
+        if (height > .2) g.rightAngle(M,u,normal,.13);
+      }
+      g.dot(A,colors.orange); g.tag(A,'A',colors.orange,9,-20);
+      g.dot(B,colors.blue); g.tag(B,'B',colors.blue,-18,10);
+      g.tag(center(A,P),'AP ≈ '+format(tA,2),colors.orange,10,-23);
+      g.tag(center(B,P),'PB ≈ '+format(-tB,2),colors.blue,-64,11);
+      g.dot(K,colors.ink); g.tag(K,height<1e-8?'K＝M(0,1)':'K(0,1)',colors.ink,12,9);
+      g.dot(P,colors.ink,5,$('midpoint-answer').open);
+      g.tag(P,vertical?'P＝M（极限）':'P(−1,1)',colors.ink,-69,-25);
+      if (!vertical && height>1e-8) {
+        g.dot(M,colors.teal,5); g.tag(M,'M',colors.teal,-16,10);
+      }
+      g.handle(P,u,1.09);
+    });
+    record('midpoint',vertical?'竖直极限 · 有限 m 无法表示':'割线 · P 在 A、B 之间',[
+      ['当前斜率 m',vertical?'不存在':'≈ '+format(u.y/u.x)],
+      ['弦中点 M','≈ ('+format(M.x,2)+', '+format(M.y,2)+')'],
+      ['距离比 |AP| / |PB|',vertical?'1（仅极限）':'≈ '+format(tA/-tB)],
+      ['距离积 |AP|·|PB|','≈ '+format(-tA*tB)]
+    ],vertical);
+  }
+
+  const renders = {ellipse:ellipseLab, area:areaLab, midpoint:midpointLab};
+  function render() { renders[state.problem](); }
+  function selectProblem(id, focus = false) {
+    state.problem = id;
+    document.querySelectorAll('[data-problem]').forEach(button => {
+      const selected = button.dataset.problem===id;
+      button.setAttribute('aria-selected',String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      $(button.dataset.problem).hidden = !selected;
+      if (focus && selected) button.focus();
+    });
+    render();
+  }
+  const tabs = [...document.querySelectorAll('[data-problem]')];
+  tabs.forEach((button,index) => {
+    button.addEventListener('click',() => selectProblem(button.dataset.problem));
+    button.addEventListener('keydown',event => {
+      const next = {ArrowLeft:(index+tabs.length-1)%tabs.length,ArrowRight:(index+1)%tabs.length,Home:0,End:tabs.length-1}[event.key];
+      if (next===undefined) return;
+      event.preventDefault();
+      selectProblem(tabs[next].dataset.problem,true);
+    });
+  });
+
+  function phase(id) {
+    state.phase = id;
+    document.querySelectorAll('[data-phase]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.phase===id)));
+    $('ellipse-focus-control').hidden = id!=='focus';
+    $('ellipse-secant-control').hidden = id!=='secant';
+    $('ellipse-legend').textContent = id==='focus' ? 'A 始终在候选椭圆上。拖动 a²，观察两段焦半径之和。' : '拖动紫色控制点或滑块。橙色是 AB，蓝色是 AC，水平虚线经过 A。';
+    render();
+  }
+  document.querySelectorAll('[data-phase]').forEach(button => button.addEventListener('click',() => phase(button.dataset.phase)));
+  $('a2').addEventListener('input',render);
+  function setAngle(id,value,updateSlider = true) {
+    const input = $(id + '-angle');
+    state[id+'Angle'] = clamp(value,Number(input.min),Number(input.max));
+    if (updateSlider) input.value = String(state[id+'Angle']);
+    render();
+  }
+  Object.keys(renders).forEach(id => {
+    const slider = $(id+'-angle'), svg = $(id+'-graph');
+    slider.addEventListener('input',() => setAngle(id,Number(slider.value),false));
+    let pointerId = null;
+    svg.addEventListener('pointerdown',event => {
+      if (!event.target.closest('[data-handle]') || pointerId!==null) return;
+      pointerId = event.pointerId;
+      svg.setPointerCapture(pointerId);
+      event.preventDefault();
+    });
+    svg.addEventListener('pointermove',event => {
+      if (event.pointerId!==pointerId) return;
+      const p = graphState[id];
+      const r = svg.getBoundingClientRect();
+      const x = ((event.clientX-r.left)*p.width/r.width-p.ox)/p.scale;
+      const y = (p.oy-(event.clientY-r.top)*p.height/r.height)/p.scale;
+      let theta = Math.atan2(y-p.pivot.y,x-p.pivot.x)*180/Math.PI;
+      if (theta>90) theta-=180;
+      if (theta<-90) theta+=180;
+      setAngle(id,Math.round(theta*10)/10);
+    });
+    svg.addEventListener('lostpointercapture',() => { pointerId=null; });
+  });
+
+  $('trail-toggle').addEventListener('click',() => {
+    state.tracing = !state.tracing;
+    $('trail-toggle').setAttribute('aria-pressed',String(state.tracing));
+    render();
+  });
+  $('trail-clear').addEventListener('click',() => { state.trail=[]; render(); });
+  $('vertical-limit').addEventListener('click',() => setAngle('midpoint',90));
+
+  const beforeDemo = {};
+  const demos = {
+    'ellipse-focus': () => { $('a2').value='6'; phase('focus'); },
+    'ellipse-line': () => { phase('secant'); setAngle('ellipse',45); },
+    'area-positive': () => setAngle('area',Math.atan(Math.sqrt(15)/9)*180/Math.PI),
+    'area-negative': () => setAngle('area',-Math.atan(Math.sqrt(15)/9)*180/Math.PI),
+    'midpoint-positive': () => setAngle('midpoint',60),
+    'midpoint-negative': () => setAngle('midpoint',-60),
+  };
+  document.querySelectorAll('[data-demo]').forEach(button => button.addEventListener('click',() => {
+    const id = state.problem;
+    if (!beforeDemo[id]) beforeDemo[id] = {angle:state[id+'Angle'],phase:state.phase,a2:$('a2').value,trail:[...state.trail]};
+    demos[button.dataset.demo]();
+    $(id+'-graph').scrollIntoView({block:'nearest'});
+  }));
+  Object.keys(renders).forEach(id => {
+    const answer = $(id+'-answer');
+    answer.addEventListener('toggle',() => {
+      const previous = beforeDemo[id];
+      if (!answer.open && previous) {
+        delete beforeDemo[id];
+        if (id==='ellipse') { $('a2').value=previous.a2; phase(previous.phase); }
+        if (id==='midpoint') state.trail=previous.trail;
+        setAngle(id,previous.angle);
+      } else if (state.problem===id) render();
+    });
+  });
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(render);
+    Object.keys(renders).forEach(id => observer.observe($(id+'-graph')));
+  } else window.addEventListener('resize',render);
+  render();
+})();
+</script>
+</body>
+</html>
